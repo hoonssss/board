@@ -16,7 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("testdb")
+//@ActiveProfiles("testdb")
 @DisplayName("JPA 연결 TEST")
 @Import(JpaConfig.class)
 @DataJpaTest
