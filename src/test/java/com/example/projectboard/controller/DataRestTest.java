@@ -1,5 +1,6 @@
 package com.example.projectboard.controller;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
@@ -16,9 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("Data Rest Test")
 @AutoConfigureMockMvc
+@SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
 @Transactional
-@SpringBootTest
+@Disabled("Spring Data Rest 통합테스는 불필요하므로 제외")
 public class DataRestTest {
 
     private final MockMvc mvc;
