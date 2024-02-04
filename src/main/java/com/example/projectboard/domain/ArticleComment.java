@@ -29,9 +29,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     @Index(columnList = "createdBy")
 })
 @ToString
-@EntityListeners(AuditingEntityListener.class)
 //@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArticleComment {
+public class ArticleComment extends AuditingFields{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +39,6 @@ public class ArticleComment {
     //optional = false -> 필수 값
     @Setter @ManyToOne(optional = false) @JoinColumn private Article article; //article(ID)
     @Setter @Column(nullable = false, length = 500) private String content; //내용
-
-    @CreatedDate @Column(nullable = false) private LocalDateTime createdAt;
-    @CreatedBy @Column(nullable = false) private String createdBy;
-    @LastModifiedDate @Column(nullable = false) private LocalDateTime modifiedAt;
-    @LastModifiedBy @Column(nullable = false) private String modifiedBy;
 
     protected ArticleComment() {}
 

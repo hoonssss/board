@@ -3,7 +3,6 @@ package com.example.projectboard.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,18 +10,12 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 @Getter
@@ -33,31 +26,32 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     @Index(columnList = "createdAt"),
     @Index(columnList = "createdBy")
 })
-@EntityListeners(AuditingEntityListener.class)
 @Entity
 //@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Article {
+public class Article extends AuditingFields{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter @Column(nullable = false) private String title; //제목
-    @Setter @Column(nullable = false, length = 10000) private String content; //내용
+    @Setter
+    @Column(nullable = false)
+    private String title; //제목
 
-    @Setter private String hashtag; //해시태그
+    @Setter
+    @Column(nullable = false, length = 10000)
+    private String content; //내용
+
+    @Setter
+    private String hashtag; //해시태그
 
     @OrderBy("id")
     @ToString.Exclude
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
-    @CreatedDate @Column(nullable = false) private LocalDateTime createdAt; //생성일시
-    @CreatedBy @Column(nullable = false, length = 100) private String createdBy; //생성자
-    @LastModifiedDate @Column(nullable = false) private LocalDateTime modifiedAt; //수정일시
-    @LastModifiedBy @Column(nullable = false, length = 100) private String modifiedBy; //수정
-
-    protected Article() {}
+    protected Article() {
+    }
 
     private Article(String title, String content, String hashtag) {
         this.title = title;
