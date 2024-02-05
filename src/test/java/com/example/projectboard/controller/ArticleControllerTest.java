@@ -27,7 +27,9 @@ class ArticleControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/articles"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
-            .andExpect(MockMvcResultMatchers.model().attributeExists("articles")); //articles date가 있는지
+            .andExpect(MockMvcResultMatchers.view().name("articles/index"))//view name
+            .andExpect(
+                MockMvcResultMatchers.model().attributeExists("articles")); //articles date 확인
     }
 
     @Disabled("구현 중")
@@ -36,25 +38,32 @@ class ArticleControllerTest {
     void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles/1"))
             .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("articles/detail"))//view name
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
-            .andExpect(MockMvcResultMatchers.model().attributeExists("article")); //articles date가 있는지
+            .andExpect(MockMvcResultMatchers.model().attributeExists("article")) //articles date 확인
+            .andExpect(MockMvcResultMatchers.model().attributeExists("articleComments")); //Comment date
+
     }
 
     @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 검색 (게시판) 페이지 -> 정상 호출 확인")
     @Test
-    void givenNothing_whenRequestingArticleSearchView_thenReturnsArticleSearchView() throws Exception {
+    void givenNothing_whenRequestingArticleSearchView_thenReturnsArticleSearchView()
+        throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles/search"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML));
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("articles/search"));
     }
 
     @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 해시태그 (게시판) 페이지 -> 정상 호출 확인")
     @Test
-    void givenNothing_whenRequestingArticleSearchHashtagView_thenReturnsArticleSearchHashtagView() throws Exception {
+    void givenNothing_whenRequestingArticleSearchHashtagView_thenReturnsArticleSearchHashtagView()
+        throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles/search-hashtag"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML));
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("search-hashtag"));
     }
 }
