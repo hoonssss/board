@@ -27,11 +27,9 @@ class ArticleControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
             .andExpect(MockMvcResultMatchers.view().name("articles/index"))//view name
-            .andExpect(
-                MockMvcResultMatchers.model().attributeExists("articles")); //articles date 확인
+            .andExpect(MockMvcResultMatchers.model().attributeExists("articles")); //articles date 확인
     }
 
-    @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 단일 (게시판) 페이지 -> 정상 호출 확인")
     @Test
     void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
