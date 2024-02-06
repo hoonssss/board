@@ -201,4 +201,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+### JPA Buddy ###
+.jpb/
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,java,gradle,intellij+all
