@@ -28,7 +28,7 @@ class ArticleControllerTest {
     void givenNothing_whenRequestingArticlesView_thenReturnsArticlesView() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
             .andExpect(MockMvcResultMatchers.model().attributeExists("articles")); //articles date가 있는지
     }
 
@@ -37,7 +37,7 @@ class ArticleControllerTest {
     void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles/1"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
             .andExpect(MockMvcResultMatchers.model().attributeExists("article")); //articles date가 있는지
     }
 
@@ -48,7 +48,7 @@ class ArticleControllerTest {
         throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles/search"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
     }
 
     @Disabled("구현 중")
@@ -58,6 +58,6 @@ class ArticleControllerTest {
         throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/articles/search-hashtag"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
     }
 }
