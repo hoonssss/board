@@ -8,11 +8,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-public class SecurityConfig{
+public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        return http
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .formLogin(Customizer.withDefaults())
             .build();
     }

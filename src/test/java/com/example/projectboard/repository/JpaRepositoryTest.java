@@ -36,7 +36,7 @@ class JpaRepositoryTest {
 
     @BeforeEach
     void BeforeEach() {
-        Article article = Article.of("test", "test", "setUpHashtag");
+        Article article = new Article("test", "test", "setUpHashtag");
         articleRepository.save(article);
     }
 
@@ -61,7 +61,7 @@ class JpaRepositoryTest {
     void givenTestData_whenInserting_thenWorkFine() {
         //given
         long count = articleRepository.count();
-        Article article = Article.of("title", "content", "#spring");
+        Article article = new Article("title", "content", "#spring");
 
         //when
         articleRepository.save(article);

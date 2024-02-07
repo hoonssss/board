@@ -1,13 +1,11 @@
-debug: false #true? ?? ?? ??
+debug: false
 management.endpoints.web.exposure.include: "*"
-#actuator endpoint ? ??? ?? ?? ??? ?? ? ?? ???? ?? ??? ? ? ? ??
 
 logging:
   level:
     com.example.projectboard: debug
     org.springframework.web.servlet: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
-    #Query log? debug log? ?? ? ? ?? binging parameter?? ? ?? ?? ??? ?? ? ? ?? ? ??? ? ?? ?
 
 spring:
   datasource:
@@ -19,16 +17,17 @@ spring:
 #  username: sa #h2 Test
 #  driver-class-name: org.h2.Driver #h2 Test
   jpa:
-    defer-datasource-initialization: true #Test? database date? ?? ? ?? ??
+    defer-datasource-initialization: true #Test? database date
     hibernate:
-      ddl-auto: create #Entity? ?? JPA??? ??? ??? ???? ???? ???? DDL ????
-    show-sql: true #SQL, Query ?? ???
-    properties: #?? ???? ???
+      ddl-auto: create
+    show-sql: true #SQL, Query
+    properties:
       hibernate:
         default_batch_fetch_size: 100
-        format_sql: true #debug Query?? ??? ??? ? ??
+        format_sql: true #debug Query
+    open-in-view: false # OSIV false
   h2.console.enabled: false #h2 console url - /h2-console
-  sql.init.mode: always #data.sql ?? ?????
+  sql.init.mode: always #data.sql
   data:
     rest:
       base-path: /api
@@ -36,10 +35,10 @@ spring:
   thymeleaf3:
     decoupled-logic: true
 
---- #? 3?? ???? ???? ?? ? ??
+---
 
 #spring:
-#  config.activate.on-profile: testdb #testdb? activate? ?? ? yaml? ??
+#  config.activate.on-profile: testdb #testdb
 #  datasource:
 #    url: jdbc:h2:mem:board;mode=mysql #mode = mysql -> mysql
 #    driverClassName: org.h2.Driver
