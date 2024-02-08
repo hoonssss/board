@@ -1,6 +1,7 @@
 package com.example.projectboard.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -11,7 +12,9 @@ import com.example.projectboard.dto.ArticleWithCommentsDto;
 import com.example.projectboard.dto.HashtagDto;
 import com.example.projectboard.dto.UserAccountDto;
 import com.example.projectboard.service.ArticleService;
+import com.example.projectboard.service.PaginationService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +40,9 @@ class ArticleControllerTest {
     @MockBean
     ArticleService articleService;
 
+    @MockBean
+    PaginationService paginationService;
+
     @Autowired
     public ArticleControllerTest(MockMvc mvc) {
         this.mvc = mvc;
@@ -48,14 +54,16 @@ class ArticleControllerTest {
         //Given
         given(articleService.searchArticles(eq(null),eq(null),any(Pageable.class))).willReturn(
             Page.empty());
-
+        given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0,1,2,3,4));
 
         mvc.perform(MockMvcRequestBuilders.get("/articles"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-            .andExpect(MockMvcResultMatchers.model().attributeExists("articles")); //articles date가 있는지
+            .andExpect(MockMvcResultMatchers.model().attributeExists("articles")) //articles date가 있는지
+            .andExpect(MockMvcResultMatchers.model().attributeExists("paginationBarNumbers")); //articles date가 있는지
 
         then(articleService).should().searchArticles(eq(null),eq(null),any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(),anyInt());
     }
 
     @DisplayName("[view][GET] 게시글 단일 (게시판) 페이지 -> 정상 호출 확인")

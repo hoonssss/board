@@ -11,12 +11,14 @@ import lombok.ToString;
 @Getter
 @ToString(callSuper = true)
 @Table(indexes = {
+    @Index(columnList = "userId", unique = true),
     @Index(columnList = "email", unique = true),
     @Index(columnList = "createdAt"),
     @Index(columnList = "createdBy")
 })
 @Entity
 public class UserAccount extends AuditingFields {
+
     @Id
     @Column(length = 50)
     private String userId;
