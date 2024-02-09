@@ -2,7 +2,6 @@ package com.example.projectboard.repository;
 
 import com.example.projectboard.domain.Article;
 import com.example.projectboard.domain.QArticle;
-import com.example.projectboard.dto.ArticleDto;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.domain.Page;

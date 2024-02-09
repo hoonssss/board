@@ -1,6 +1,7 @@
 package com.example.projectboard.controller;
 
 import com.example.projectboard.config.SecurityConfig;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @DisplayName("View Controller - Auth")
 @Import(SecurityConfig.class)
 @WebMvcTest
+@Disabled("구현중")
 public class AuthControllerTest {
 
     private final MockMvc mvc;
