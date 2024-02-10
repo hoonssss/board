@@ -53,8 +53,9 @@ public class Article extends AuditingFields {
         joinColumns = @JoinColumn(name = "articleId"),
         inverseJoinColumns = @JoinColumn(name = "hashtagId")
     )
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Hashtag> hashtag = new LinkedHashSet<>();
+    private Set<Hashtag> hashtags = new LinkedHashSet<>();
 
 
     @ToString.Exclude
@@ -76,15 +77,15 @@ public class Article extends AuditingFields {
     }
 
     public void addHashtag(Hashtag hashtag) {
-        this.getHashtag().add(hashtag);
+        this.getHashtags().add(hashtag);
     }
 
-    public void addHashtags(Set<Hashtag> hashtags) {
-        this.getHashtag().addAll(hashtags);
+    public void addHashtags(Collection<Hashtag> hashtags) {
+        this.getHashtags().addAll(hashtags);
     }
 
     public void clearHashtags() {
-        this.getHashtag().clear();
+        this.getHashtags().clear();
     }
 
     @Override
@@ -98,4 +99,5 @@ public class Article extends AuditingFields {
     public int hashCode() {
         return Objects.hash(this.getId());
     }
+
 }
