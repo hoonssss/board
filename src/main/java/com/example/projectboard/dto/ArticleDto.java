@@ -35,7 +35,7 @@ public record ArticleDto(
             UserAccountDto.from(entity.getUserAccount()),
             entity.getTitle(),
             entity.getContent(),
-            entity.getHashtag().stream()
+            entity.getHashtags().stream()
                 .map(HashtagDto::from)
                 .collect(Collectors.toUnmodifiableSet())
             ,

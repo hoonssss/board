@@ -1,13 +1,21 @@
 package com.example.projectboard.domain;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
+import com.example.projectboard.domain.Article;
+import com.example.projectboard.domain.AuditingFields;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @ToString(callSuper = true)
@@ -24,7 +32,7 @@ public class Hashtag extends AuditingFields {
     private Long id;
 
     @ToString.Exclude
-    @ManyToMany(mappedBy = "hashtag")
+    @ManyToMany(mappedBy = "hashtags")
     private Set<Article> articles = new LinkedHashSet<>();
 
     @Setter @Column(nullable = false) private String hashtagName; // 해시태그 이름

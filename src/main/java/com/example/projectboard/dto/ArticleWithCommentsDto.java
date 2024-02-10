@@ -32,7 +32,7 @@ public record ArticleWithCommentsDto(
             ,
             entity.getTitle(),
             entity.getContent(),
-            entity.getHashtag().stream()
+            entity.getHashtags().stream()
                 .map(HashtagDto::from)
                 .collect(Collectors.toUnmodifiableSet())
             ,
