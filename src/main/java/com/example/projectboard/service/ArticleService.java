@@ -6,8 +6,11 @@ import com.example.projectboard.domain.type.SearchType;
 import com.example.projectboard.dto.ArticleDto;
 import com.example.projectboard.dto.ArticleWithCommentsDto;
 import com.example.projectboard.repository.ArticleRepository;
+import com.example.projectboard.repository.HashtagRepository;
+import com.example.projectboard.repository.quertdsl.HashtagRepositoryImpl;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final HashtagRepository hashtagRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword,
@@ -77,5 +81,18 @@ public class ArticleService {
 
     public void deleteArticle(long articleId) {
         articleRepository.deleteById(articleId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ArticleDto> searchArticlesViaHashtag(String hashtag, Pageable pageable) {
+        if(hashtag == null || hashtag.isBlank()){
+            return Page.empty(pageable);
+        }
+
+        return articleRepository.findByHashtagNames(List.of(hashtag),pageable).map(ArticleDto::from);
+    }
+
+    public List<String> getHashtags() {
+        return hashtagRepository.findAllHashtagNames(); // TODO: HashtagService 로 이동을 고려해보자.
     }
 }
