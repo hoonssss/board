@@ -1,28 +1,20 @@
 package com.example.projectboard.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.projectboard.domain.Article;
 import com.example.projectboard.domain.Hashtag;
 import com.example.projectboard.domain.UserAccount;
-import com.example.projectboard.domain.type.SearchType;
 import com.example.projectboard.dto.ArticleDto;
-import com.example.projectboard.dto.ArticleUpdateDto;
-import com.example.projectboard.dto.ArticleWithCommentsDto;
 import com.example.projectboard.dto.HashtagDto;
 import com.example.projectboard.dto.UserAccountDto;
 import com.example.projectboard.repository.ArticleRepository;
+import com.example.projectboard.repository.HashtagRepository;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +37,9 @@ class ArticleServiceTest {
     @Mock
     private ArticleRepository articleRepository;
 
+    @Mock
+    private HashtagRepository hashtagRepository;
+
     /**
      * 검색 각 게시글 페이지 이동 페이지네이션
      */
@@ -60,6 +55,39 @@ class ArticleServiceTest {
 
         //Then
         assertThat(articles).isNotNull();
+    }
+
+    @DisplayName("검색어 없이 게시글을 해시태그 검색하면, 빈 페이지를 반환한다")
+    @Test
+    void givenNoSearchParameters_whenSearchingArticlesViaHashtag_thenReturnEmptyPage() {
+        //Given
+        Pageable pageable = Pageable.ofSize(20);
+
+        //When
+        Page<ArticleDto> articleDtos = sut.searchArticlesViaHashtag(null,pageable);
+
+
+        //Then
+        assertThat(articleDtos).isEqualTo(Page.empty(pageable));
+        then(articleRepository).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("검색어 없이 게시글을 해시태그 검색하면, 게시글 페이지를 반환한다")
+    @Test
+    void givenHashtag_whenSearchingArticlesViaHashtag_thenReturnArticlesPage() {
+        //Given
+        String hashtagName = "java";
+        Pageable pageable = Pageable.ofSize(20);
+        Article article = createArticle(1L);
+        given(articleRepository.findByHashtagNames(List.of(hashtagName),pageable)).willReturn(Page.empty(pageable));
+
+        //When
+        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtagName,pageable);
+
+
+        //Then
+        assertThat(articles).isEqualTo(Page.empty(pageable));
+        then(articleRepository).should().findByHashtagNames(List.of(hashtagName),pageable);
     }
 
     @Test
@@ -106,6 +134,22 @@ class ArticleServiceTest {
 
         //Then
         then(articleRepository).should().deleteById(articleId);
+    }
+
+    @DisplayName("해시태그를 조회하면 유니크 해시태그 리스트를 반환한다.")
+    @Test
+    void givenNothing_whenCalling_thenReturnHashtags() {
+        //Given
+        Article article = createArticle(1L);
+        List<String> expectedHashtags = List.of("#java","#spring","#boot");
+        given(hashtagRepository.findAllHashtagNames()).willReturn(expectedHashtags);
+
+        //When
+        List<String> actualHashtags = sut.getHashtags();
+
+        //Then
+        assertThat(actualHashtags).isEqualTo(expectedHashtags);
+        then(hashtagRepository).should().findAllHashtagNames();
     }
 
     private UserAccount createUserAccount() {
@@ -174,7 +218,7 @@ class ArticleServiceTest {
             "jh",
             "password",
             "jh@mail.com",
-            "Uno",
+            "jh",
             "This is memo",
             LocalDateTime.now(),
             "jh",

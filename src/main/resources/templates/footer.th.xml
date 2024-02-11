@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<thlogic>
+  <attr sel="#home" th:href="@{/}" />
+  <attr sel="#JHEmail" th:href="'mailto:wogns8030@naver.com'" />
+</thlogic>

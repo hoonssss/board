@@ -9,22 +9,22 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-public class ArticleRepositoryImpl extends QuerydslRepositorySupport implements ArticleRepositoryCustom{
+public class ArticleRepositoryImpl extends QuerydslRepositorySupport implements ArticleRepositoryCustom,HashtagRepositoryCustom{
 
     public ArticleRepositoryImpl() {
         super(Article.class);
     }
 
+
     @Override
     public List<String> findAllDistinctHashtags() {
-        QArticle article = QArticle.article;
+        QArticle qArticle = QArticle.article;
 
-        return from(article)
+        return from(qArticle)
             .distinct()
-            .select(article.hashtags.any().hashtagName)
+            .select(qArticle.hashtags.any().hashtagName)
             .fetch();
     }
 
@@ -38,5 +38,10 @@ public class ArticleRepositoryImpl extends QuerydslRepositorySupport implements 
             .where(hashtag.hashtagName.in(hashtagNames));
         List<Article> articles = getQuerydsl().applyPagination(pageable, query).fetch();
         return new PageImpl<>(articles,pageable,query.fetchCount());
+    }
+
+    @Override
+    public List<String> findAllHashtagNames() {
+        return null;
     }
 }
