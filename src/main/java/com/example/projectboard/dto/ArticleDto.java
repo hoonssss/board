@@ -32,7 +32,10 @@ public record ArticleDto(
             UserAccountDto.from(entity.getUserAccount()),
             entity.getTitle(),
             entity.getContent(),
-            entity.getHashtag(),
+            entity.getHashtags().stream()
+                .map(HashtagDto::from)
+                .collect(Collectors.toUnmodifiableSet()).toString()
+            ,
             entity.getCreatedAt(),
             entity.getCreatedBy(),
             entity.getModifiedAt(),
@@ -44,8 +47,7 @@ public record ArticleDto(
         return Article.of(
             userAccount,
             title,
-            content,
-            hashtag
+            content
         );
     }
 

@@ -2,6 +2,7 @@ package com.example.projectboard.repository.quertdsl;
 
 import com.example.projectboard.domain.Article;
 import com.example.projectboard.domain.QArticle;
+import com.example.projectboard.domain.QHashtag;
 import com.querydsl.jpa.JPQLQuery;
 import java.util.Collection;
 import java.util.List;
@@ -22,22 +23,21 @@ public class ArticleRepositoryCustomImpl extends QuerydslRepositorySupport imple
 
         return from(article)
             .distinct()
-            .select(article.hashtag)
-            .where(article.hashtag.isNotNull())
+            .select(article.hashtags.any().hashtagName)
             .fetch();
     }
 
-//    @Override
-//    public Page<Article> findByHashtagNames(Collection<String> hashtagNames, Pageable pageable) {
-//        QHashtag hashtag = QHashtag.hashtag;
-//        QArticle article = QArticle.article;
-//
-//        JPQLQuery<Article> query = from(article)
-//            .innerJoin(article.hashtags, hashtag)
-//            .where(hashtag.hashtagName.in(hashtagNames));
-//        List<Article> articles = getQuerydsl().applyPagination(pageable, query).fetch();
-//
-//        return new PageImpl<>(articles, pageable, query.fetchCount());
-//    }
+    @Override
+    public Page<Article> findByHashtagNames(Collection<String> hashtagNames, Pageable pageable) {
+        QHashtag hashtag = QHashtag.hashtag;
+        QArticle article = QArticle.article;
+
+        JPQLQuery<Article> query = from(article)
+            .innerJoin(article.hashtags, hashtag)
+            .where(hashtag.hashtagName.in(hashtagNames));
+        List<Article> articles = getQuerydsl().applyPagination(pageable, query).fetch();
+
+        return new PageImpl<>(articles, pageable, query.fetchCount());
+    }
 
 }

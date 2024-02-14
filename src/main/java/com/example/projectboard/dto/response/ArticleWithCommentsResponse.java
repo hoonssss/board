@@ -1,6 +1,7 @@
 package com.example.projectboard.dto.response;
 
 import com.example.projectboard.dto.ArticleWithCommentsDto;
+import com.example.projectboard.dto.HashtagDto;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,7 +33,8 @@ public record ArticleWithCommentsResponse(
             dto.id(),
             dto.title(),
             dto.content(),
-            dto.hashtag(),
+            dto.hashtagDtos().stream().map(
+                HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet()).toString(),
             dto.createdAt(),
             dto.userAccountDto().email(),
             nickname,
