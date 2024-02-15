@@ -29,3 +29,5 @@ Spring Boot
 * QueryDSL 5.0.0
 * Bootstrap 5.2.0-Beta1
 * Heroku
+
+* 유즈케이스 다이어그램: [#4](https://github.com/djkeh/fastcampus-project-board/issues/4), https://viewer.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fdjkeh%2Ffastcampus-project-board%2Fmain%2Fdocument%2Fuse-case.svg
