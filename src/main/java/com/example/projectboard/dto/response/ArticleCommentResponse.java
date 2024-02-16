@@ -2,9 +2,6 @@ package com.example.projectboard.dto.response;
 
 import com.example.projectboard.dto.ArticleCommentDto;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 
 public record ArticleCommentResponse(
     Long id,
@@ -15,7 +12,7 @@ public record ArticleCommentResponse(
     String userId
 ) {
 
-    public static ArticleCommentResponse of(Long id, String content, LocalDateTime createdAt, String email, String nickname,String userId) {
+    public static ArticleCommentResponse of(Long id, String content, LocalDateTime createdAt, String email, String nickname, String userId) {
         return new ArticleCommentResponse(id, content, createdAt, email, nickname, userId);
     }
 

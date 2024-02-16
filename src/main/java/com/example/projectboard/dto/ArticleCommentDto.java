@@ -1,12 +1,9 @@
 package com.example.projectboard.dto;
 
-import static com.example.projectboard.domain.QUserAccount.userAccount;
-
 import com.example.projectboard.domain.Article;
 import com.example.projectboard.domain.ArticleComment;
 import com.example.projectboard.domain.UserAccount;
 import java.time.LocalDateTime;
-
 
 public record ArticleCommentDto(
     Long id,

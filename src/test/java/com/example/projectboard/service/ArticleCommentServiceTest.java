@@ -1,12 +1,5 @@
 package com.example.projectboard.service;
 
-
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willDoNothing;
-
 import com.example.projectboard.domain.Article;
 import com.example.projectboard.domain.ArticleComment;
 import com.example.projectboard.domain.UserAccount;
@@ -15,16 +8,21 @@ import com.example.projectboard.dto.UserAccountDto;
 import com.example.projectboard.repository.ArticleCommentRepository;
 import com.example.projectboard.repository.ArticleRepository;
 import com.example.projectboard.repository.UserAccountRepository;
+import com.example.projectboard.service.ArticleCommentService;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.test.context.support.WithMockUser;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
 
 @DisplayName("비즈니스 로직 - 댓글")
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +46,9 @@ class ArticleCommentServiceTest {
         List<ArticleCommentDto> actual = sut.searchArticleComments(articleId);
 
         // Then
+        assertThat(actual)
+            .hasSize(1)
+            .first().hasFieldOrPropertyWithValue("content", expected.getContent());
         then(articleCommentRepository).should().findByArticle_Id(articleId);
     }
 
@@ -100,6 +101,9 @@ class ArticleCommentServiceTest {
         sut.updateArticleComment(dto);
 
         // Then
+        assertThat(articleComment.getContent())
+            .isNotEqualTo(oldContent)
+            .isEqualTo(updatedContent);
         then(articleCommentRepository).should().getReferenceById(dto.id());
     }
 
@@ -117,13 +121,12 @@ class ArticleCommentServiceTest {
         then(articleCommentRepository).should().getReferenceById(dto.id());
     }
 
-
     @DisplayName("댓글 ID를 입력하면, 댓글을 삭제한다.")
     @Test
     void givenArticleCommentId_whenDeletingArticleComment_thenDeletesArticleComment() {
         // Given
         Long articleCommentId = 1L;
-        String userId = "jh";
+        String userId = "uno";
         willDoNothing().given(articleCommentRepository).deleteByIdAndUserAccount_UserId(articleCommentId, userId);
 
         // When
@@ -132,6 +135,7 @@ class ArticleCommentServiceTest {
         // Then
         then(articleCommentRepository).should().deleteByIdAndUserAccount_UserId(articleCommentId, userId);
     }
+
 
     private ArticleCommentDto createArticleCommentDto(String content) {
         return ArticleCommentDto.of(
@@ -162,7 +166,7 @@ class ArticleCommentServiceTest {
 
     private ArticleComment createArticleComment(String content) {
         return ArticleComment.of(
-            Article.of(createUserAccount(), "title", "content"),
+            Article.of(createUserAccount(), "title", "content", "hashtag"),
             createUserAccount(),
             content
         );
@@ -182,7 +186,8 @@ class ArticleCommentServiceTest {
         return Article.of(
             createUserAccount(),
             "title",
-            "content"
+            "content",
+            "#java"
         );
     }
 

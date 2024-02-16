@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +45,6 @@ public class ArticleController {
         map.addAttribute("articles", articles);
         map.addAttribute("paginationBarNumbers", barNumbers);
         map.addAttribute("searchTypes", SearchType.values());
-        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
 
         return "articles/index";
     }
@@ -56,7 +56,6 @@ public class ArticleController {
         map.addAttribute("article", article);
         map.addAttribute("articleComments", article.articleCommentsResponse());
         map.addAttribute("totalCount", articleService.getArticleCount());
-        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
 
         return "articles/detail";
     }
@@ -86,7 +85,7 @@ public class ArticleController {
         return "articles/form";
     }
 
-    @PostMapping("/form")
+    @PostMapping ("/form")
     public String postNewArticle(
         @AuthenticationPrincipal BoardPrincipal boardPrincipal,
         ArticleRequest articleRequest
@@ -106,7 +105,7 @@ public class ArticleController {
         return "articles/form";
     }
 
-    @PostMapping("/{articleId}/form")
+    @PostMapping ("/{articleId}/form")
     public String updateArticle(
         @PathVariable Long articleId,
         @AuthenticationPrincipal BoardPrincipal boardPrincipal,
@@ -117,7 +116,7 @@ public class ArticleController {
         return "redirect:/articles/" + articleId;
     }
 
-    @PostMapping("/{articleId}/delete")
+    @PostMapping ("/{articleId}/delete")
     public String deleteArticle(
         @PathVariable Long articleId,
         @AuthenticationPrincipal BoardPrincipal boardPrincipal

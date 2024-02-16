@@ -1,13 +1,5 @@
 package com.example.projectboard.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.when;
-
 import com.example.projectboard.domain.Article;
 import com.example.projectboard.domain.UserAccount;
 import com.example.projectboard.domain.constant.SearchType;
@@ -16,11 +8,8 @@ import com.example.projectboard.dto.ArticleWithCommentsDto;
 import com.example.projectboard.dto.UserAccountDto;
 import com.example.projectboard.repository.ArticleRepository;
 import com.example.projectboard.repository.UserAccountRepository;
+import com.example.projectboard.service.ArticleService;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,17 +20,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
+
 @DisplayName("비즈니스 로직 - 게시글")
 @ExtendWith(MockitoExtension.class)
 class ArticleServiceTest {
 
-    @InjectMocks
-    private ArticleService sut;
+    @InjectMocks private ArticleService sut;
 
-    @Mock
-    private ArticleRepository articleRepository;
-    @Mock
-    private UserAccountRepository userAccountRepository;
+    @Mock private ArticleRepository articleRepository;
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("검색어 없이 게시글을 검색하면, 게시글 페이지를 반환한다.")
     @Test
@@ -65,8 +60,7 @@ class ArticleServiceTest {
         SearchType searchType = SearchType.TITLE;
         String searchKeyword = "title";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(
-            Page.empty());
+        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
 
         // When
         Page<ArticleDto> articles = sut.searchArticles(searchType, searchKeyword, pageable);
@@ -90,22 +84,20 @@ class ArticleServiceTest {
         then(articleRepository).shouldHaveNoInteractions();
     }
 
-    @Disabled("hashtag error 발생")
     @DisplayName("게시글을 해시태그 검색하면, 게시글 페이지를 반환한다.")
     @Test
     void givenHashtag_whenSearchingArticlesViaHashtag_thenReturnsArticlesPage() {
         // Given
         String hashtag = "#java";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByHashtagNames(List.of("test"), pageable)).willReturn(
-            Page.empty(pageable));
+        given(articleRepository.findByHashtag(hashtag, pageable)).willReturn(Page.empty(pageable));
 
         // When
         Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtag, pageable);
 
         // Then
         assertThat(articles).isEqualTo(Page.empty(pageable));
-        then(articleRepository).should().findByHashtagNames(List.of("test"), pageable);
+        then(articleRepository).should().findByHashtag(hashtag, pageable);
     }
 
     @DisplayName("게시글 ID로 조회하면, 댓글 달긴 게시글을 반환한다.")
@@ -122,7 +114,8 @@ class ArticleServiceTest {
         // Then
         assertThat(dto)
             .hasFieldOrPropertyWithValue("title", article.getTitle())
-            .hasFieldOrPropertyWithValue("content", article.getContent());
+            .hasFieldOrPropertyWithValue("content", article.getContent())
+            .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
         then(articleRepository).should().findById(articleId);
     }
 
@@ -157,7 +150,8 @@ class ArticleServiceTest {
         // Then
         assertThat(dto)
             .hasFieldOrPropertyWithValue("title", article.getTitle())
-            .hasFieldOrPropertyWithValue("content", article.getContent());
+            .hasFieldOrPropertyWithValue("content", article.getContent())
+            .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
         then(articleRepository).should().findById(articleId);
     }
 
@@ -183,8 +177,7 @@ class ArticleServiceTest {
     void givenArticleInfo_whenSavingArticle_thenSavesArticle() {
         // Given
         ArticleDto dto = createArticleDto();
-        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(
-            createUserAccount());
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(articleRepository.save(any(Article.class))).willReturn(createArticle());
 
         // When
@@ -195,38 +188,39 @@ class ArticleServiceTest {
         then(articleRepository).should().save(any(Article.class));
     }
 
-    @Disabled("Error")
     @DisplayName("게시글의 수정 정보를 입력하면, 게시글을 수정한다.")
     @Test
     void givenModifiedArticleInfo_whenUpdatingArticle_thenUpdatesArticle() {
         // Given
         Article article = createArticle();
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
-        given(articleRepository.getReferenceById(article.getId())).willReturn(article);
-        given(userAccountRepository.getReferenceById("1L")).willReturn(article.getUserAccount());
+        given(articleRepository.getReferenceById(dto.id())).willReturn(article);
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(dto.userAccountDto().toEntity());
 
         // When
-        sut.updateArticle(1L, dto);
+        sut.updateArticle(dto.id(), dto);
 
         // Then
+        assertThat(article)
+            .hasFieldOrPropertyWithValue("title", dto.title())
+            .hasFieldOrPropertyWithValue("content", dto.content())
+            .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
         then(articleRepository).should().getReferenceById(dto.id());
-        then(userAccountRepository).should().getReferenceById(article.getUserAccount().getUserId());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
     }
 
     @DisplayName("없는 게시글의 수정 정보를 입력하면, 경고 로그를 찍고 아무 것도 하지 않는다.")
     @Test
     void givenNonexistentArticleInfo_whenUpdatingArticle_thenLogsWarningAndDoesNothing() {
         // Given
-        ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "해시태그");
-        given(articleRepository.getReferenceById(dto.id())).willThrow(
-            EntityNotFoundException.class);
+        ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
+        given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
 
         // When
         sut.updateArticle(dto.id(), dto);
 
         // Then
         then(articleRepository).should().getReferenceById(dto.id());
-        then(userAccountRepository).shouldHaveNoInteractions();
     }
 
     @DisplayName("게시글의 ID를 입력하면, 게시글을 삭제한다")
@@ -234,7 +228,7 @@ class ArticleServiceTest {
     void givenArticleId_whenDeletingArticle_thenDeletesArticle() {
         // Given
         Long articleId = 1L;
-        String userId = "jhTest";
+        String userId = "uno";
         willDoNothing().given(articleRepository).deleteByIdAndUserAccount_UserId(articleId, userId);
 
         // When
@@ -289,7 +283,8 @@ class ArticleServiceTest {
         Article article = Article.of(
             createUserAccount(),
             "title",
-            "content"
+            "content",
+            "#java"
         );
         ReflectionTestUtils.setField(article, "id", 1L);
 
