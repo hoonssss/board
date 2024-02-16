@@ -1,107 +1,108 @@
-//package com.example.projectboard.repository;
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//
-//import com.example.projectboard.config.JpaConfig;
-//import com.example.projectboard.domain.Article;
-//import java.util.List;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Disabled;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-//import org.junit.jupiter.api.Order;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.TestMethodOrder;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-//import org.springframework.context.annotation.Import;
-//import org.springframework.test.context.ActiveProfiles;
-//
-////@ActiveProfiles("testdb")
-//@DisplayName("JPA 연결 TEST")
-//@Import(JpaConfig.class)
-//@DataJpaTest
-//@TestMethodOrder(OrderAnnotation.class)
-//class JpaRepositoryTest {
-//
-//    private final ArticleRepository articleRepository;
-//    private final ArticleCommentRepository articleCommentRepository;
-//
-//    JpaRepositoryTest(
-//        @Autowired ArticleRepository articleRepository,
-//        @Autowired ArticleCommentRepository articleCommentRepository
-//    ) {
-//        this.articleRepository = articleRepository;
-//        this.articleCommentRepository = articleCommentRepository;
-//    }
-//
-//    @BeforeEach
-//    void BeforeEach() {
-//        Article article = new Article("test", "test", "setUpHashtag");
-//        articleRepository.save(article);
-//    }
-//
-//    @DisplayName("조회")
-//    @Order(1)
-//    @Test
-//    void givenTestData_whenSelecting_thenWorkFine() {
-//        //given
-//
-//        //when
-//        List<Article> articles = articleRepository.findAll();
-//
-//        //then
-//        assertThat(articles)
-//            .isNotNull()
-//            .hasSize(1);
-//    }
-//
-//    @DisplayName("삽입")
-//    @Order(2)
-//    @Test
-//    void givenTestData_whenInserting_thenWorkFine() {
-//        //given
-//        long count = articleRepository.count();
-//        Article article = new Article("title", "content", "#spring");
-//
-//        //when
-//        articleRepository.save(article);
-//
-//        //then
-//        assertThat(articleRepository.count()).isEqualTo(count + 1);
-//    }
-//
-//    @DisplayName("업데이트")
-//    @Order(3)
-//    @Test
-//    void givenTestData_whenUpdating_thenWorkFine() {
-//        //Given
-//        Article findArticle = articleRepository.findById(4L).orElseThrow();
-//        String updateHashtag = "#springboot";
-//        findArticle.setHashtag(updateHashtag);
-//
-//        //When
-//        Article saveArticle = articleRepository.saveAndFlush(findArticle);//test update query
-//
-//        //Then
-//        assertThat(saveArticle).hasFieldOrPropertyWithValue("hashtag", updateHashtag);
-//    }
-//
-//    @DisplayName("삭제")
-//    @Order(4)
-//    @Test
-//    void givenTestData_whenDeleting_thenWorkFine() {
-//        //Given
-//        Article article = articleRepository.findById(5L).orElseThrow();
-//        long count = articleRepository.count();
-//        long comment = articleCommentRepository.count();
-//        int deleteComment = article.getArticleComments().size();
-//
-//        //When
-//        articleRepository.delete(article);
-//
-//        //Then
-//        assertThat(articleRepository.count()).isEqualTo(count - 1);
-//        assertThat(articleCommentRepository.count()).isEqualTo(comment - deleteComment);
-//    }
-//}
+package com.example.projectboard.repository;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.example.projectboard.config.TestJpaConfig;
+import com.example.projectboard.domain.Article;
+import com.example.projectboard.domain.Hashtag;
+import com.example.projectboard.domain.UserAccount;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+
+//@ActiveProfiles("testdb")
+@DisplayName("JPA 연결 TEST")
+@Import(TestJpaConfig.class)
+@DataJpaTest
+class JpaRepositoryTest {
+
+    private final ArticleRepository articleRepository;
+    private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
+    private final HashtagRepository hashtagRepository;
+
+    JpaRepositoryTest(
+        @Autowired ArticleRepository articleRepository,
+        @Autowired ArticleCommentRepository articleCommentRepository,
+        @Autowired UserAccountRepository userAccountRepository,
+        @Autowired HashtagRepository hashtagRepository
+    ) {
+        this.articleRepository = articleRepository;
+        this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
+        this.hashtagRepository = hashtagRepository;
+    }
+
+    @DisplayName("select test")
+    @Order(1)
+    @Test
+    void givenTestData_whenSelecting_thenWorkFine() {
+        //given
+
+        //when
+        List<Article> articles = articleRepository.findAll();
+
+        //then
+        assertThat(articles)
+            .isNotNull();
+    }
+
+    @DisplayName("insert test")
+    @Order(2)
+    @Test
+    void givenTestData_whenInserting_thenWorkFine() {
+        //Given
+        long previousCount = articleRepository.count();
+        UserAccount userAccount = userAccountRepository.save(
+            UserAccount.of("JH", "test", null, null, null));
+        Article article = Article.of(userAccount, "title", "content");
+        article.addHashtags(Set.of(Hashtag.of("spring")));
+
+        //When
+        articleRepository.save(article);
+
+        //Then
+        assertThat(articleRepository.count()).isEqualTo(previousCount + 1);
+    }
+
+    @DisplayName("update 테스트")
+    @Test
+    void givenTestData_whenUpdating_thenWorksFine() {
+        //Given
+        Article article = articleRepository.findById(1L).orElseThrow();
+        Hashtag updateHashtag = Hashtag.of("update");
+        article.clearHashtags();
+        article.addHashtags(Set.of(updateHashtag));
+
+        //When
+        Article saveArticle = articleRepository.saveAndFlush(article);
+
+        //Then
+        assertThat(saveArticle.getHashtags())
+            .hasSize(1)
+                .extracting("hashtagName", String.class)
+                    .containsExactly(updateHashtag.getHashtagName());
+    }
+
+    @DisplayName("delete 테스트")
+    @Test
+    void givenTestData_whenDeleting_thenWorksFien(){
+        //Given
+        Article article = articleRepository.findById(1L).orElseThrow();
+        long previousArticleCount = articleRepository.count();
+        long previousArticleCommentCount = articleCommentRepository.count();
+        int deleteCommentSize = article.getArticleComments().size();
+
+        //When
+        articleRepository.delete(article);
+
+        //Then
+        assertThat(articleRepository.count()).isEqualTo(previousArticleCount - 1);
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - deleteCommentSize);
+    }
+}
