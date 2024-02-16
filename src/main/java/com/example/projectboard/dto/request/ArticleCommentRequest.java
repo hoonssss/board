@@ -4,8 +4,10 @@ import com.example.projectboard.dto.ArticleCommentDto;
 import com.example.projectboard.dto.UserAccountDto;
 import java.time.LocalDateTime;
 
-public record ArticleCommentRequest(Long articleId, String content) {
-
+public record ArticleCommentRequest(
+    Long articleId,
+    String content
+) {
     public static ArticleCommentRequest of(Long articleId, String content) {
         return new ArticleCommentRequest(articleId, content);
     }
@@ -17,5 +19,4 @@ public record ArticleCommentRequest(Long articleId, String content) {
             content
         );
     }
-
 }
