@@ -24,8 +24,7 @@ public class ArticleCommentController {
         @AuthenticationPrincipal BoardPrincipal boardPrincipal,
         ArticleCommentRequest articleCommentRequest
     ) {
-        articleCommentService.saveArticleComment(
-            articleCommentRequest.toDto(boardPrincipal.toDto()));
+        articleCommentService.saveArticleComment(articleCommentRequest.toDto(boardPrincipal.toDto()));
 
         return "redirect:/articles/" + articleCommentRequest.articleId();
     }
@@ -40,4 +39,5 @@ public class ArticleCommentController {
 
         return "redirect:/articles/" + articleId;
     }
+
 }

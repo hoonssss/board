@@ -21,21 +21,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@RequiredArgsConstructor
-@Service
 @Slf4j
+@RequiredArgsConstructor
+@Transactional
+@Service
 public class ArticleService {
 
-    private final UserAccountRepository userAccountRepository;
-
-    private final ArticleRepository articleRepository;
     private final HashtagService hashtagService;
+    private final ArticleRepository articleRepository;
+    private final UserAccountRepository userAccountRepository;
+    private final HashtagRepository hashtagRepository;
 
     @Transactional(readOnly = true)
-    public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword,
-        Pageable pageable) {
-        if (searchType == null || searchKeyword.isBlank()) {
+    public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
+        if (searchKeyword == null || searchKeyword.isBlank()) {
             return articleRepository.findAll(pageable).map(ArticleDto::from);
         }
 
@@ -66,24 +65,13 @@ public class ArticleService {
             .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
-    @Transactional(readOnly = true)
-    public Page<ArticleDto> searchArticlesViaHashtag(String hashtag, Pageable pageable) {
-        if (hashtag == null || hashtag.isBlank()) {
-            return Page.empty(pageable);
-        }
-        return articleRepository.findByHashtagNames(List.of(hashtag), pageable)
-            .map(ArticleDto::from);
-    }
-
-
-    public List<String> getHashtags() {
-        return articleRepository.findAllDistinctHashtags();
-    }
-
     public void saveArticle(ArticleDto dto) {
-        UserAccount userAccount = userAccountRepository.getReferenceById(
-            dto.userAccountDto().userId());
-        articleRepository.save(dto.toEntity(userAccount));
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+        Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+
+        Article article = dto.toEntity(userAccount);
+        article.addHashtags(hashtags);
+        articleRepository.save(article);
     }
 
     public void updateArticle(Long articleId, ArticleDto dto) {
@@ -91,9 +79,10 @@ public class ArticleService {
             Article article = articleRepository.getReferenceById(articleId);
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
 
-            if(article.getUserAccount().equals(userAccount)){
-                if(dto.title() != null) article.setTitle(dto.title());
-                if(dto.content() != null) article.setContent(dto.content());
+            if (article.getUserAccount().equals(userAccount)) {
+                if (dto.title() != null) { article.setTitle(dto.title()); }
+                if (dto.content() != null) { article.setContent(dto.content()); }
+
                 Set<Long> hashtagIds = article.getHashtags().stream()
                     .map(Hashtag::getId)
                     .collect(Collectors.toUnmodifiableSet());
@@ -111,12 +100,35 @@ public class ArticleService {
     }
 
     public void deleteArticle(long articleId, String userId) {
+        Article article = articleRepository.getReferenceById(articleId);
+        Set<Long> hashtagIds = article.getHashtags().stream()
+            .map(Hashtag::getId)
+            .collect(Collectors.toUnmodifiableSet());
+
         articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
+        articleRepository.flush();
+
+        hashtagIds.forEach(hashtagService::deleteHashtagWithoutArticles);
     }
 
     public long getArticleCount() {
         return articleRepository.count();
     }
+
+    @Transactional(readOnly = true)
+    public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
+        if (hashtagName == null || hashtagName.isBlank()) {
+            return Page.empty(pageable);
+        }
+
+        return articleRepository.findByHashtagNames(List.of(hashtagName), pageable)
+            .map(ArticleDto::from);
+    }
+
+    public List<String> getHashtags() {
+        return hashtagRepository.findAllHashtagNames(); // TODO: HashtagService 로 이동을 고려해보자.
+    }
+
 
     private Set<Hashtag> renewHashtagsFromContent(String content) {
         Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
@@ -133,7 +145,5 @@ public class ArticleService {
 
         return hashtags;
     }
-
-
 
 }

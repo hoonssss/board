@@ -2,13 +2,14 @@ package com.example.projectboard.service;
 
 import com.example.projectboard.domain.Hashtag;
 import com.example.projectboard.repository.HashtagRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @RequiredArgsConstructor
