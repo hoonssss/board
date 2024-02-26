@@ -12,23 +12,42 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        return http
+//            .authorizeHttpRequests(auth -> auth
+//                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() //정적 리소스
+//                .requestMatchers(HttpMethod.GET, "/", "/articles", "articles/search-hashtag").permitAll() // 접근 허용
+//                .anyRequest().authenticated())
+//            .formLogin(Customizer.withDefaults())
+//            .logout(logout -> logout.logoutSuccessUrl("/")) //logout -> redirect
+//            .build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() //정적 리소스
-                .requestMatchers(HttpMethod.GET, "/", "/articles", "articles/search-hashtag").permitAll() // 접근 허용
+        http.csrf((csrf) -> csrf.disable());
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/",
+                    "/articles",
+                    "/articles/search-hashtag"
+                ).permitAll()
                 .anyRequest().authenticated())
             .formLogin(Customizer.withDefaults())
-            .logout(logout -> logout.logoutSuccessUrl("/")) //logout -> redirect
-            .build();
+            .logout(logout -> logout
+                .logoutSuccessUrl("/").permitAll());
+        return http.build();
     }
 
     /**
@@ -53,7 +72,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public PasswordEncoder noOpPasswordEncoder(){
+        return NoOpPasswordEncoder.getInstance();
     }
 }
