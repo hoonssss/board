@@ -5,4 +5,5 @@
   <attr sel="#username" sec:authorize="isAuthenticated()" sec:authentication="name" />
   <attr sel="#login" sec:authorize="!isAuthenticated()" th:href="@{/login}" />
   <attr sel="#logout" sec:authorize="isAuthenticated()" th:href="@{/logout}" />
+<!--  <attr sel="#signup" sec:authorize="!isAuthenticated()" th:href="@{/signup}" />-->
 </thlogic>

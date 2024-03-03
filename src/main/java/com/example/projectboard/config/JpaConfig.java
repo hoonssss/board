@@ -15,13 +15,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class JpaConfig {
 
     @Bean
-    public AuditorAware<String> auditorAware(){
+    public AuditorAware<BoardPrincipal> auditorAware() {
         return () -> Optional.ofNullable(SecurityContextHolder.getContext())
             .map(SecurityContext::getAuthentication)
             .filter(Authentication::isAuthenticated)
             .map(Authentication::getPrincipal)
-            .map(BoardPrincipal.class::cast)
-            .map(BoardPrincipal::getUsername);
+            .filter(principal -> principal instanceof BoardPrincipal)
+            .map(BoardPrincipal.class::cast);
     }
-
 }
+

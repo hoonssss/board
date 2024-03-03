@@ -35,15 +35,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf((csrf) -> csrf.disable());
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/",
-                    "/articles",
-                    "/articles/search-hashtag",
-                    "/articles/**"
-                ).permitAll()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers(HttpMethod.GET, "/", "/articles", "/articles/search-hashtag", "/articles/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/signup").permitAll()
                 .anyRequest().authenticated())
             .formLogin(Customizer.withDefaults())
             .logout(logout -> logout
