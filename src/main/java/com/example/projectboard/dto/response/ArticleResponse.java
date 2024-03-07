@@ -10,7 +10,7 @@ public record ArticleResponse(
     Long id,
     String title,
     String content,
-    Set<String> hashtag,
+    Set<String> hashtags,
     LocalDateTime createdAt,
     String email,
     String nickname
