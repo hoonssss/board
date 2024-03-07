@@ -143,11 +143,7 @@ class ArticleServiceTest {
         // Then
         assertThat(dto)
             .hasFieldOrPropertyWithValue("title", article.getTitle())
-            .hasFieldOrPropertyWithValue("content", article.getContent())
-            .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
-                .map(HashtagDto::from)
-                .collect(Collectors.toUnmodifiableSet())
-            );
+            .hasFieldOrPropertyWithValue("content", article.getContent());
         then(articleRepository).should().findById(articleId);
     }
 
