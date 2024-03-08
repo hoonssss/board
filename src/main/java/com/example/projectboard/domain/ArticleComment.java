@@ -3,6 +3,7 @@ package com.example.projectboard.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,14 +50,17 @@ public class ArticleComment extends AuditingFields {
     @ToString.Exclude
     @OrderBy("createdAt ASC")
     @OneToMany(mappedBy = "parentCommentId", cascade = CascadeType.ALL)
-    private Set<ArticleComment> childComments = new LinkedHashSet<>();
+    private Set<ArticleComment> childComments = new LinkedHashSet<>(); // hibernate 스펙에 의하면 jpa Entity class는 final 키워드를 권고하지 않음
 
-    @Setter @Column(nullable = false, length = 500) private String content; // 본문
+    @Setter
+    @Column(nullable = false, length = 500)
+    private String content; // 본문
 
+    protected ArticleComment() {
+    }
 
-    protected ArticleComment() {}
-
-    private ArticleComment(Article article, UserAccount userAccount, Long parentCommentId, String content) {
+    private ArticleComment(Article article, UserAccount userAccount, Long parentCommentId,
+        String content) {
         this.article = article;
         this.userAccount = userAccount;
         this.parentCommentId = parentCommentId;
@@ -67,15 +71,19 @@ public class ArticleComment extends AuditingFields {
         return new ArticleComment(article, userAccount, null, content);
     }
 
-    public void addChildComment(ArticleComment child) {
+    public void addChildComment(ArticleComment child){
         child.setParentCommentId(this.getId());
         this.getChildComments().add(child);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ArticleComment that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArticleComment that)) {
+            return false;
+        }
         return this.getId() != null && this.getId().equals(that.getId());
     }
 
