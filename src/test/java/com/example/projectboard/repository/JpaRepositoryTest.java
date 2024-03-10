@@ -67,7 +67,8 @@ class JpaRepositoryTest {
     void givenTestData_whenInserting_thenWorksFine() {
         // Given
         long previousCount = articleRepository.count();
-        UserAccount userAccount = userAccountRepository.save(UserAccount.of("newUno", "pw", null, null, null));
+        UserAccount userAccount = userAccountRepository.save(
+            UserAccount.of("newUno", "pw", null, null, null));
         Article article = Article.of(userAccount, "new article", "new content");
         article.addHashtags(Set.of(Hashtag.of("spring")));
 
@@ -111,22 +112,22 @@ class JpaRepositoryTest {
 
         // Then
         assertThat(articleRepository.count()).isEqualTo(previousArticleCount - 1);
-        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - deletedCommentsSize);
+        assertThat(articleCommentRepository.count()).isEqualTo(
+            previousArticleCommentCount - deletedCommentsSize);
     }
 
     @DisplayName("대댓글 조회 테스트")
     @Test
     void givenParentCommentId_whenSelecting_thenReturnsChildComments() {
-        // Given
+        //Given
 
-        // When
+        //When
         Optional<ArticleComment> parentComment = articleCommentRepository.findById(1L);
 
-        // Then
-        assertThat(parentComment).get()
+        //Then
+        assertThat(parentComment).get() //get = null check test
             .hasFieldOrPropertyWithValue("parentCommentId", null)
-            .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
-            .hasSize(4);
+            .extracting("childComments", InstanceOfAssertFactories.COLLECTION).hasSize(4);
     }
 
     @DisplayName("댓글에 대댓글 삽입 테스트")
@@ -162,10 +163,10 @@ class JpaRepositoryTest {
         articleCommentRepository.delete(parentComment);
 
         // Then
-        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5); // 테스트 댓글 + 대댓글 4개
+        assertThat(articleCommentRepository.count()).isEqualTo(
+            previousArticleCommentCount - 5); // 테스트 댓글 + 대댓글 4개
     }
 
-    @Disabled
     @DisplayName("댓글 삭제와 대댓글 전체 연동 삭제 테스트 - 댓글 ID + 유저 ID")
     @Test
     void givenArticleCommentIdHavingChildCommentsAndUserId_whenDeletingParentComment_thenDeletesEveryComment() {
@@ -173,10 +174,11 @@ class JpaRepositoryTest {
         long previousArticleCommentCount = articleCommentRepository.count();
 
         // When
-        articleCommentRepository.deleteByIdAndUserAccount_UserId(1L, "uno");
+        articleCommentRepository.deleteByIdAndUserAccount_UserId(1L, "jh");
 
         // Then
-        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5); // 테스트 댓글 + 대댓글 4개
+        assertThat(articleCommentRepository.count()).isEqualTo(
+            previousArticleCommentCount - 5); // 테스트 댓글 + 대댓글 4개
     }
 
     @DisplayName("[Querydsl] 전체 hashtag 리스트에서 이름만 조회하기")
@@ -206,7 +208,8 @@ class JpaRepositoryTest {
 
         // Then
         assertThat(articlePage.getContent()).hasSize(pageable.getPageSize());
-        assertThat(articlePage.getContent().get(0).getTitle()).isEqualTo("Fusce posuere felis sed lacus.");
+        assertThat(articlePage.getContent().get(0).getTitle()).isEqualTo(
+            "Fusce posuere felis sed lacus.");
         assertThat(articlePage.getContent().get(0).getHashtags())
             .extracting("hashtagName", String.class)
             .containsExactly("fuscia");
@@ -214,13 +217,13 @@ class JpaRepositoryTest {
         assertThat(articlePage.getTotalPages()).isEqualTo(4);
     }
 
-
     @EnableJpaAuditing
     @TestConfiguration
     static class TestJpaConfig {
+
         @Bean
         AuditorAware<String> auditorAware() {
-            return () -> Optional.of("uno");
+            return () -> Optional.of("jh");
         }
     }
 
