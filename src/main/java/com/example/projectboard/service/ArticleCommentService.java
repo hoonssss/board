@@ -35,8 +35,17 @@ public class ArticleCommentService {
     public void saveArticleComment(ArticleCommentDto dto) {
         try {
             Article article = articleRepository.getReferenceById(dto.articleId());
-            UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
-            articleCommentRepository.save(dto.toEntity(article, userAccount));
+            UserAccount userAccount = userAccountRepository.getReferenceById(
+                dto.userAccountDto().userId());
+            ArticleComment articleComment = dto.toEntity(article, userAccount);
+
+            if (dto.parentCommentId() != null) {
+                ArticleComment parentComment = articleCommentRepository.getReferenceById(
+                    dto.parentCommentId());
+                parentComment.addChildComment(articleComment);
+            } else {
+                articleCommentRepository.save(dto.toEntity(article,userAccount));
+            }
         } catch (EntityNotFoundException e) {
             log.warn("댓글 저장 실패. 댓글 작성에 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
         }
@@ -45,7 +54,9 @@ public class ArticleCommentService {
     public void updateArticleComment(ArticleCommentDto dto) {
         try {
             ArticleComment articleComment = articleCommentRepository.getReferenceById(dto.id());
-            if (dto.content() != null) { articleComment.setContent(dto.content()); }
+            if (dto.content() != null) {
+                articleComment.setContent(dto.content());
+            }
         } catch (EntityNotFoundException e) {
             log.warn("댓글 업데이트 실패. 댓글을 찾을 수 없습니다 - dto: {}", dto);
         }
