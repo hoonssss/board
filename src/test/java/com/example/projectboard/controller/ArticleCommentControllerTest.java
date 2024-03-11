@@ -113,7 +113,7 @@ class ArticleCommentControllerTest {
                     .with(csrf())
             )
             .andExpect(status().is3xxRedirection())
-            .andExpect(view().name("redirect:/articles"+articleId))
+            .andExpect(view().name("redirect:/articles/" + articleId))
             .andExpect(redirectedUrl("/articles/" + articleId));
         //Then
         then(articleCommentService).should().saveArticleComment(any(ArticleCommentDto.class));
