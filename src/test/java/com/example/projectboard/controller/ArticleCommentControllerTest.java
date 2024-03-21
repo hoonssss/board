@@ -35,7 +35,8 @@ class ArticleCommentControllerTest {
     private final MockMvc mvc;
     private final FormDataEncoder formDataEncoder;
 
-    @MockBean private ArticleCommentService articleCommentService;
+    @MockBean
+    private ArticleCommentService articleCommentService;
 
 
     public ArticleCommentControllerTest(
@@ -47,14 +48,15 @@ class ArticleCommentControllerTest {
     }
 
 
-    @WithUserDetails(value = "unoTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "jhtest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 댓글 등록 - 정상 호출")
     @Test
     void givenArticleCommentInfo_whenRequesting_thenSavesNewArticleComment() throws Exception {
         // Given
         long articleId = 1L;
         ArticleCommentRequest request = ArticleCommentRequest.of(articleId, "test comment");
-        willDoNothing().given(articleCommentService).saveArticleComment(any(ArticleCommentDto.class));
+        willDoNothing().given(articleCommentService)
+            .saveArticleComment(any(ArticleCommentDto.class));
 
         // When & Then
         mvc.perform(
@@ -76,7 +78,7 @@ class ArticleCommentControllerTest {
         // Given
         long articleId = 1L;
         long articleCommentId = 1L;
-        String userId = "unoTest";
+        String userId = "jhtest";
         willDoNothing().given(articleCommentService).deleteArticleComment(articleCommentId, userId);
 
         // When & Then
@@ -89,7 +91,32 @@ class ArticleCommentControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/articles/" + articleId))
             .andExpect(redirectedUrl("/articles/" + articleId));
-//        then(articleCommentService).should().deleteArticleComment(articleCommentId, userId);
+        then(articleCommentService).should().deleteArticleComment(articleCommentId, userId);
+    }
+
+    @WithUserDetails(value = "jhtest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[view][POST] 대댓글 등록 - 정상 호출")
+    @Test
+    void givenArticleCommentInfoWithParentCommentId_whenRequesting_thenSaveNewChildComment()
+        throws Exception {
+        //Given
+        long articleId = 1L;
+        ArticleCommentRequest request = ArticleCommentRequest.of(articleId, 1L, "test comment");
+        willDoNothing().given(articleCommentService)
+            .saveArticleComment(any(ArticleCommentDto.class));
+
+        //When
+        mvc.perform(
+                post("/comments/new")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .content(formDataEncoder.encode(request))
+                    .with(csrf())
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/articles/" + articleId))
+            .andExpect(redirectedUrl("/articles/" + articleId));
+        //Then
+        then(articleCommentService).should().saveArticleComment(any(ArticleCommentDto.class));
     }
 
 }

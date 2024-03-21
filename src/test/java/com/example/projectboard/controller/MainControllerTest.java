@@ -30,7 +30,7 @@ class MainControllerTest {
 
         //When
         mvc.perform(MockMvcRequestBuilders.get("/"))
-            .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+            .andExpect(MockMvcResultMatchers.status().isOk());
 
         //Then
     }

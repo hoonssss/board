@@ -100,27 +100,27 @@ class ArticleCommentServiceTest {
         then(articleCommentRepository).shouldHaveNoInteractions();
     }
 
-//    @DisplayName("부모 댓글 ID와 댓글 정보를 입력하면, 대댓글을 저장한다.")
-//    @Test
-//    void givenParentCommentIdAndArticleCommentInfo_whenSaving_thenSavesChildComment() {
-//        // Given
-//        Long parentCommentId = 1L;
-//        ArticleComment parent = createArticleComment(parentCommentId, "댓글");
-//        ArticleCommentDto child = createArticleCommentDto(parentCommentId, "대댓글");
-//        given(articleRepository.getReferenceById(child.articleId())).willReturn(createArticle());
-//        given(userAccountRepository.getReferenceById(child.userAccountDto().userId())).willReturn(createUserAccount());
-//        given(articleCommentRepository.getReferenceById(child.parentCommentId())).willReturn(parent);
-//
-//        // When
-//        sut.saveArticleComment(child);
-//
-//        // Then
-//        assertThat(child.parentCommentId()).isNotNull();
-//        then(articleRepository).should().getReferenceById(child.articleId());
-//        then(userAccountRepository).should().getReferenceById(child.userAccountDto().userId());
-//        then(articleCommentRepository).should().getReferenceById(child.parentCommentId());
-//        then(articleCommentRepository).should(never()).save(any(ArticleComment.class));
-//    }
+    @DisplayName("부모 댓글 ID와 댓글 정보를 입력하면, 대댓글을 저장한다.")
+    @Test
+    void givenParentCommentIdAndArticleCommentInfo_whenSaving_thenSavesChildComment() {
+        // Given
+        Long parentCommentId = 1L;
+        ArticleComment parent = createArticleComment(parentCommentId, "댓글");
+        ArticleCommentDto child = createArticleCommentDto(parentCommentId, "대댓글");
+        given(articleRepository.getReferenceById(child.articleId())).willReturn(createArticle());
+        given(userAccountRepository.getReferenceById(child.userAccountDto().userId())).willReturn(createUserAccount());
+        given(articleCommentRepository.getReferenceById(child.parentCommentId())).willReturn(parent);
+
+        // When
+        sut.saveArticleComment(child);
+
+        // Then
+        assertThat(child.parentCommentId()).isNotNull();
+        then(articleRepository).should().getReferenceById(child.articleId());
+        then(userAccountRepository).should().getReferenceById(child.userAccountDto().userId());
+        then(articleCommentRepository).should().getReferenceById(child.parentCommentId());
+        then(articleCommentRepository).should(never()).save(any(ArticleComment.class));
+    }
 
     @DisplayName("댓글 ID를 입력하면, 댓글을 삭제한다.")
     @Test
