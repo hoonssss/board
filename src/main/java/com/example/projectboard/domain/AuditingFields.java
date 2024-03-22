@@ -19,24 +19,28 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 @ToString
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+/**
+ * 추상클래스이고 각 필드는 상속 받는 자식 Entity에서 접근 및 수정이 가능해야 함
+ * 따라서 private -> protected 로 변경
+ **/
 public abstract class AuditingFields {
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime createdAt; //생성일시
+    protected LocalDateTime createdAt; //생성일시
 
     @CreatedBy
     @Column(length = 100, updatable = false)
-    private String createdBy; //생성자
+    protected String createdBy; //생성자
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     @LastModifiedDate
     @Column
-    private LocalDateTime modifiedAt; //수정일시
+    protected LocalDateTime modifiedAt; //수정일시
 
     @LastModifiedBy
     @Column(length = 100)
-    private String modifiedBy; //수정
+    protected String modifiedBy; //수정
 
 }

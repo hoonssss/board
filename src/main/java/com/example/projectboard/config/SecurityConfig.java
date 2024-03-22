@@ -67,6 +67,9 @@ public class SecurityConfig {
             .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다" + username));
     }
 
+    /**
+     * 보안 상 향후 수정
+     */
     @Bean
     public PasswordEncoder noOpPasswordEncoder(){
         return NoOpPasswordEncoder.getInstance();
